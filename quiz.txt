@@ -1,0 +1,28 @@
+Respostas para as perguntas do questionário:
+
+* Qual o objetivo do comando cache em Spark?
+Resp. O comando cache armazena em RDD resultante do processamento em paralelo para que este tenha seu uso recorrente facilitado, otimizando as operações da aplicação.
+
+* O mesmo código implementado em Spark é normalmente mais rápido que a implementação equivalente em MapReduce. Por quê?
+Resp. Spark é mais ágil que MapReduce no estágio map, utilizando mais recursos de disco e menos de CPU. 
+
+* Qual é a função do SparkContext?
+Resp. É a função que cria uma seção ativa o cluster para possibilitar o processamento em paraleilo, ou localmente.
+
+* Explique com suas palavras o que é Resilient Distributed Datasets (RDD).
+Resp. É a unidade básica de abstração em Spark, a partir da qual são realizadas operações utilizando o paralelismo dos dados no cluster para extrairmos informações dos dados. Sobre um RDD são realizadas transformations (operações que resultam em novos RDDs) e actions (operações que retornam valores para o usuário). RDDs são gerados via lazy evaluation a partir do momento em que é disparado um action. Persistência de RDDs é comum para otimizar o processamento recorrente.
+
+
+* GroupByKey é menos eficiente que reduceByKey em grandes dataset. Por quê?
+Resp. Devido o fato de que reduceByKey realiza menos operações de shuffle que groupByKey (este envia dados para os estágios reduce a cada agrupamento, causando problemas de performance pois o RDD ainda não está particionado). 
+
+* Explique o que o código Scala abaixo faz.
+
+val textFile = sc.textFile("hdfs://...")
+val counts = textFile.flatMap(line=>line.split(" "))
+             .map(word=>(word, 1))
+             .reduceByKey(_+_) 
+counts.saveAsTextFile ( "hdfs://..." )
+
+Resp. O código acima implementa a contagem de palavras em Scala. O método flatMap percorre o texto criando chaves (keys) a cada espaço em branco. Em seguida são iniciados contadores para cada key (trecho map(word=>(word, 1))) para em fim os contadores serem incrementados (.reduceByKey(_+_), que é uma forma econômica de Scala escrever reduceByKey((x,y)=> x + y)). Ao fim do processo as contagens de palavras são escritas em um arquivo via SparkContext.
+ 
